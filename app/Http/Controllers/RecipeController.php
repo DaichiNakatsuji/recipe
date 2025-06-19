@@ -13,7 +13,7 @@ class RecipeController extends Controller
     // 一般公開されているレシピ一覧（トップページ）
     public function index()
     {
-        $recipes = Recipe::where('is_public', true){
+        $recipes = Recipe::where('is_public', true)
           ->where(function($query) {
               $query->whereNull('publish_at')->orWhere('publish_at', '<=', now());
           })
@@ -47,7 +47,8 @@ class RecipeController extends Controller
     // レシピ作成フォーム表示
     public function create()
     {
-        return view('recipes.create');
+        $ingredients = \App\Models\Ingredient::all();
+        return view('recipes.create', compact('ingredients'));
     }
 
     // レシピ保存処理
