@@ -18,9 +18,6 @@ use App\Http\Controllers\RecipeController;
 // トップページ（公開レシピ一覧）
 Route::get('/', [RecipeController::class, 'index'])->name('recipes.index');
 
-// レシピ詳細（公開されているもの、もしくは自分のレシピのみ）
-Route::get('/recipes/{id}', [RecipeController::class, 'show'])->name('recipes.show');
-
 // 認証済ユーザー用ルート（マイページ、投稿・編集・削除など）
 Route::middleware(['auth'])->group(function () {
 
@@ -38,8 +35,13 @@ Route::middleware(['auth'])->group(function () {
     // レシピ削除
     Route::delete('/recipes/{id}', [RecipeController::class, 'destroy'])->name('recipes.destroy');
 
+    // Route::resource('/recipes', RecipeController::class, ['only' => ['create', 'store', 'edit', 'update', 'destroy']]);
+
     // 公開/非公開切り替え
     Route::put('/recipes/{id}/toggle', [RecipeController::class, 'toggleVisibility'])->name('recipes.toggle');
 });
+
+// レシピ詳細（公開されているもの、もしくは自分のレシピのみ）
+Route::get('/recipes/{id}', [RecipeController::class, 'show'])->name('recipes.show');
 
 require __DIR__.'/auth.php';

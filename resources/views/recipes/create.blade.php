@@ -7,58 +7,58 @@
     </div>
 
     <div class="flex justify-center">
-        <form method="POST" action="{{ route('recipes.store') }}" class="w-1/2">
+        <form method="POST" action="{{ route('recipes.store') }}">
             @csrf
 
-            <div class="form-control my-4">
-                <label for="title" class="label">
-                    <span class="label-text">タイトル:</span>
-                </label>
-                <input type="text" name="title" value="{{ old('title') }}" class="input input-bordered w-full">
-            </div>
-
-            <div id="ingredients" class="form-control my-4">
-                <label class="label">
-                    <span class="label-text">材料:</span>
-                </label>
-                <div class="space-y-2" id="ingredients-list">
-                    <div class="flex space-x-2">
-                        <select name="ingredients[0][name]" class="select select-bordered flex-1">
-                            <option value="">-- 材料を選択 --</option>
-                            @foreach ($ingredients as $ingredient)
-                                <option value="{{ $ingredient->ingredient_name }}"
-                                    {{ old('ingredients.0.name') == $ingredient->ingredient_name ? 'selected' : '' }}>
-                                    {{ $ingredient->ingredient_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <input type="text" name="ingredients[0][num]" placeholder="量"
-                            value="{{ old('ingredients.0.num') }}" class="input input-bordered flex-1">
-                    </div>
+                <div class="form-control my-4">
+                    <label for="title" class="label">
+                        <span class="label-text">タイトル:</span>
+                    </label>
+                    <input type="text" name="title" value="{{ old('title') }}" class="input input-bordered w-full">
                 </div>
-                <button type="button" id="add-ingredient-btn" class="btn btn-sm btn-info mt-2">材料追加</button>
-            </div>
 
-            <div class="form-control my-4">
-                <label for="instructions" class="label">
-                    <span class="label-text">作り方:</span>
-                </label>
-                <textarea name="instructions" rows="5" class="textarea textarea-bordered w-full">{{ old('instructions') }}</textarea>
-            </div>
+                <div id="ingredients" class="form-control my-4">
+                    <label class="label">
+                        <span class="label-text">材料:</span>
+                    </label>
+                    <div class="space-y-2" id="ingredients-list">
+                        <div class="flex space-x-2">
+                            <select name="ingredients[0][name]" class="select select-bordered flex-1">
+                                <option value="">-- 材料を選択 --</option>
+                                @foreach ($ingredients as $ingredient)
+                                    <option value="{{ $ingredient->ingredient_name }}"
+                                        {{ old('ingredients.0.name') == $ingredient->ingredient_name ? 'selected' : '' }}>
+                                        {{ $ingredient->ingredient_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <input type="text" name="ingredients[0][num]" placeholder="量"
+                                value="{{ old('ingredients.0.num') }}" class="input input-bordered flex-1">
+                        </div>
+                    </div>
+                    <button type="button" id="add-ingredient-btn" class="btn btn-sm btn-info mt-2">材料追加</button>
+                </div>
 
-            <div class="form-control my-4">
-                <label class="cursor-pointer label">
-                    <span class="label-text">公開する</span>
-                    <input type="checkbox" name="is_public" value="1" {{ old('is_public') ? 'checked' : '' }} class="checkbox">
-                </label>
-            </div>
+                <div class="form-control my-4">
+                    <label for="instructions" class="label">
+                        <span class="label-text">作り方:</span>
+                    </label>
+                    <textarea name="instructions" rows="5" class="textarea textarea-bordered w-full">{{ old('instructions') }}</textarea>
+                </div>
 
-            <div class="form-control my-4">
-                <label class="label">
-                    <span class="label-text">公開日時:</span>
-                </label>
-                <input type="datetime-local" name="publish_at" value="{{ old('publish_at') }}" class="input input-bordered">
-            </div>
+                <div class="form-control my-4">
+                    <label class="cursor-pointer label">
+                        <span class="label-text">公開する</span>
+                        <input type="checkbox" name="is_public" value="1" {{ old('is_public') ? 'checked' : '' }} class="checkbox">
+                    </label>
+                </div>
+
+                <div class="form-control my-4">
+                    <label class="label">
+                        <span class="label-text">公開日時:</span>
+                    </label>
+                    <input type="datetime-local" name="publish_at" value="{{ old('publish_at') }}" class="input input-bordered">
+                </div>
 
             <button type="submit" class="btn btn-primary btn-outline">保存</button>
         </form>

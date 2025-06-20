@@ -29,7 +29,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $table->dropForeign(['user_id']);
+        Schema::table('recipes', function (Blueprint $table) {
+            $table->dropForeign(['user_id']); // 外部キー制約を削除
+        });
         Schema::dropIfExists('recipes');
     }
 };

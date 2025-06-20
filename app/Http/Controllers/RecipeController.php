@@ -13,20 +13,14 @@ class RecipeController extends Controller
     // 一般公開されているレシピ一覧（トップページ）
     public function index()
     {
-        $recipes = Recipe::where('is_public', true)
-          ->where(function($query) {
-              $query->whereNull('publish_at')->orWhere('publish_at', '<=', now());
-          })
-          ->with('user')
-          ->latest()
-          ->get();
-
+        $recipes = Recipe::where('is_public', true)->where(function($query) {$query->whereNull('publish_at')->orWhere('publish_at', '<=', now());})->with('user')->latest()->get();
         return view('recipes.index', compact('recipes'));
     }
 
     // レシピ詳細（誰でも閲覧可能）
     public function show($id)
     {
+        // dd('test_show');
         $recipe = Recipe::with(['ingredients', 'user'])->findOrFail($id);
 
         // 非公開レシピにアクセスしようとしたら、トップにリダイレクト
@@ -47,7 +41,8 @@ class RecipeController extends Controller
     // レシピ作成フォーム表示
     public function create()
     {
-        $ingredients = \App\Models\Ingredient::all();
+        $ingredients = Ingredient::all();
+        // dd('test_create');
         return view('recipes.create', compact('ingredients'));
     }
 
