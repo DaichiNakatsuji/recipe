@@ -11,4 +11,6 @@
             </li>
         @endforeach
     </ul>
+    {{-- ページネーションのリンク --}}
+    {{ $recipes->links() }}
 @endsection

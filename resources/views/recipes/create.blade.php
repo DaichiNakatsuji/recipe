@@ -37,6 +37,10 @@
                         </div>
                     </div>
                     <button type="button" id="add-ingredient-btn" class="btn btn-sm btn-info mt-2">材料追加</button>
+                    <div class="flex space-x-2 mt-2">
+                        <input type="text" id="new-ingredient" name="new_ingredients[0]" placeholder="新しい材料名を入力" class="input input-bordered flex-1">
+                        <button type="button" id="add-new-ingredient" class="btn btn-sm btn-info">新しい材料を追加</button>
+                    </div>
                 </div>
 
                 <div class="form-control my-4">
@@ -67,15 +71,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const addBtn = document.getElementById('add-ingredient-btn');
+            const addNewIngredientBtn = document.getElementById('add-new-ingredient');
             const list = document.getElementById('ingredients-list');
+            const newIngredientInput = document.getElementById('new-ingredient');
             let index = 1;
 
-            const ingredientOptions = `
-                <option value="">-- 材料を選択 --</option>
-                @foreach ($ingredients as $ingredient)
-                    <option value="{{ $ingredient->ingredient_name }}">{{ $ingredient->ingredient_name }}</option>
-                @endforeach
-            `;
+            const ingredientOptions = `@foreach ($ingredients as $ingredient)
+                <option value="{{ $ingredient->ingredient_name }}">{{ $ingredient->ingredient_name }}</option>
+            @endforeach`;
 
             addBtn.addEventListener('click', function () {
                 const div = document.createElement('div');
@@ -88,6 +91,23 @@
                 `;
                 list.appendChild(div);
                 index++;
+            });
+
+            addNewIngredientBtn.addEventListener('click', function () {
+                const newIngredient = newIngredientInput.value.trim();
+                if (newIngredient) {
+                    const div = document.createElement('div');
+                    div.className = 'flex space-x-2';
+                    div.innerHTML = `
+                        <select name="ingredients[${index}][name]" class="select select-bordered flex-1">
+                            <option value="${newIngredient}" selected>${newIngredient}</option>
+                        </select>
+                        <input type="text" name="ingredients[${index}][num]" placeholder="量" class="input input-bordered flex-1">
+                    `;
+                    list.appendChild(div);
+                    index++;
+                    newIngredientInput.value = '';
+                }
             });
         });
     </script>

@@ -13,7 +13,7 @@ class RecipeController extends Controller
     // 一般公開されているレシピ一覧（トップページ）
     public function index()
     {
-        $recipes = Recipe::where('is_public', true)->where(function($query) {$query->whereNull('publish_at')->orWhere('publish_at', '<=', now());})->with('user')->latest()->get();
+        $recipes = Recipe::where('is_public', true)->where(function($query) {$query->whereNull('publish_at')->orWhere('publish_at', '<=', now());})->with('user')->latest()->paginate(25);
         return view('recipes.index', compact('recipes'));
     }
 
@@ -49,17 +49,21 @@ class RecipeController extends Controller
     // レシピ保存処理
     public function store(Request $request)
     {
+        // バリデーションのルール
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'instructions' => 'required|string',
             'is_public' => 'boolean',
             'publish_at' => 'nullable|date',
             'ingredients' => 'required|array',
-            'ingredients.*.name' => 'required|string|max:255',
-            'ingredients.*.num' => 'required|string|max:255',
+            'ingredients.*.name' => 'nullable|string|max:255',  // 材料は選択しなくてもOK
+            'ingredients.*.num' => 'nullable|string|max:255',   // 量も指定しなくてもOK
+            'new_ingredients' => 'nullable|array',
+            'new_ingredients.*' => 'nullable|string|max:255',    // 新しい材料のバリデーション
         ]);
 
         DB::transaction(function () use ($validated) {
+            // レシピの作成
             $recipe = Recipe::create([
                 'user_id' => Auth::id(),
                 'title' => $validated['title'],
@@ -68,14 +72,28 @@ class RecipeController extends Controller
                 'publish_at' => $validated['publish_at'],
             ]);
 
-            foreach ($validated['ingredients'] as $ingredientData) {
-                $ingredient = Ingredient::firstOrCreate([
-                    'ingredient_name' => $ingredientData['name']
-                ]);
+            // 新しい材料の追加
+            if (isset($validated['new_ingredients']) && is_array($validated['new_ingredients'])) {
+                foreach ($validated['new_ingredients'] as $newIngredient) {
+                    $ingredient = Ingredient::firstOrCreate([
+                        'ingredient_name' => $newIngredient
+                    ]);
 
-                $recipe->ingredients()->attach($ingredient->id, [
-                    'num' => $ingredientData['num']
-                ]);
+                    $recipe->ingredients()->attach($ingredient->id);
+                }
+            }
+
+            // 既存の材料の処理
+            foreach ($validated['ingredients'] as $ingredientData) {
+                if (!empty($ingredientData['name'])) { // 空の材料を無視
+                    $ingredient = Ingredient::firstOrCreate([
+                        'ingredient_name' => $ingredientData['name']
+                    ]);
+
+                    $recipe->ingredients()->attach($ingredient->id, [
+                        'num' => $ingredientData['num'] ?? ''
+                    ]);
+                }
             }
         });
 
@@ -92,19 +110,24 @@ class RecipeController extends Controller
     // レシピ更新処理
     public function update(Request $request, $id)
     {
+        // ユーザーが所有するレシピを取得
         $recipe = Recipe::where('user_id', Auth::id())->findOrFail($id);
 
+        // バリデーション
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'instructions' => 'required|string',
             'is_public' => 'boolean',
             'publish_at' => 'nullable|date',
             'ingredients' => 'required|array',
-            'ingredients.*.name' => 'required|string|max:255',
-            'ingredients.*.num' => 'required|string|max:255',
+            'ingredients.*.name' => 'required|string|max:255',  // 材料名のバリデーション
+            'ingredients.*.num' => 'required|string|max:255',   // 材料の量のバリデーション
+            'new_ingredient' => 'nullable|string|max:255',  // 新しい材料のバリデーション（もし存在する場合）
         ]);
 
+        // トランザクションを開始
         DB::transaction(function () use ($recipe, $validated) {
+            // レシピの基本情報を更新
             $recipe->update([
                 'title' => $validated['title'],
                 'instructions' => $validated['instructions'],
@@ -112,19 +135,37 @@ class RecipeController extends Controller
                 'publish_at' => $validated['publish_at'],
             ]);
 
+            // 既存の材料を削除
             $recipe->ingredients()->detach();
 
+            // 新しい材料を追加（新しい材料がある場合は処理）
+            if ($validated['new_ingredient']) {
+                // 新しい材料を作成
+                $ingredient = Ingredient::firstOrCreate([
+                    'ingredient_name' => $validated['new_ingredient']
+                ]);
+
+                // 新しい材料をレシピに関連付ける
+                $recipe->ingredients()->attach($ingredient->id, [
+                    'num' => $validated['ingredients'][0]['num']  // 新しい材料の量
+                ]);
+            }
+
+            // 既存の材料を更新
             foreach ($validated['ingredients'] as $ingredientData) {
+                // 既存の材料を作成または取得
                 $ingredient = Ingredient::firstOrCreate([
                     'ingredient_name' => $ingredientData['name']
                 ]);
 
+                // レシピと材料を関連付ける
                 $recipe->ingredients()->attach($ingredient->id, [
-                    'num' => $ingredientData['num']
+                    'num' => $ingredientData['num']  // 材料の量を保存
                 ]);
             }
         });
 
+        // レシピが更新された後のリダイレクト
         return redirect()->route('recipes.my')->with('success', 'レシピを更新しました。');
     }
 
