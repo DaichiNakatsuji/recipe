@@ -32,8 +32,8 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <input type="text" name="ingredients[0][num]" placeholder="量"
-                                value="{{ old('ingredients.0.num') }}" class="input input-bordered flex-1">
+                            <input type="text" name="ingredients[0][num]" placeholder="量" value="{{ old('ingredients.0.num') }}" class="input input-bordered flex-1">
+                            <button type="button" class="btn btn-sm btn-danger remove-ingredient">削除</button>
                         </div>
                     </div>
                     <button type="button" id="add-ingredient-btn" class="btn btn-sm btn-info mt-2">材料追加</button>
@@ -88,6 +88,7 @@
                         ${ingredientOptions}
                     </select>
                     <input type="text" name="ingredients[${index}][num]" placeholder="量" class="input input-bordered flex-1">
+                    <button type="button" class="btn btn-sm btn-danger remove-ingredient">削除</button>
                 `;
                 list.appendChild(div);
                 index++;
@@ -103,10 +104,18 @@
                             <option value="${newIngredient}" selected>${newIngredient}</option>
                         </select>
                         <input type="text" name="ingredients[${index}][num]" placeholder="量" class="input input-bordered flex-1">
+                        <button type="button" class="btn btn-sm btn-danger remove-ingredient">削除</button>
                     `;
                     list.appendChild(div);
                     index++;
                     newIngredientInput.value = '';
+                }
+            });
+
+            // 削除ボタンのイベントリスナー（親要素にイベントをバインド）
+            list.addEventListener('click', function (e) {
+                if (e.target.classList.contains('remove-ingredient')) {
+                    e.target.closest('div').remove();
                 }
             });
         });
