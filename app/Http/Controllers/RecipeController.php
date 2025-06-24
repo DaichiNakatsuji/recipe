@@ -75,11 +75,13 @@ class RecipeController extends Controller
             // 新しい材料の追加
             if (isset($validated['new_ingredients']) && is_array($validated['new_ingredients'])) {
                 foreach ($validated['new_ingredients'] as $newIngredient) {
-                    $ingredient = Ingredient::firstOrCreate([
-                        'ingredient_name' => $newIngredient
-                    ]);
+                    if (!empty($newIngredient)) { // 空でない場合のみ処理
+                        $ingredient = Ingredient::firstOrCreate([
+                            'ingredient_name' => $newIngredient
+                        ]);
 
-                    $recipe->ingredients()->attach($ingredient->id);
+                        $recipe->ingredients()->attach($ingredient->id);
+                    }
                 }
             }
 
