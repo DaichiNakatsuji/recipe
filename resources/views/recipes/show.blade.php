@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mt-4">
+    <div class="mt-4 max-w-2xl mx-auto">
         <h1 class="text-3xl font-bold">{{ $recipe->title }}</h1>
         <p class="text-gray-600 mt-2"><strong>作成者:</strong> {{ $recipe->user->name }}</p>
 

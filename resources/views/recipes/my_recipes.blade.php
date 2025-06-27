@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mt-4">
+    <div class="mt-4 max-w-2xl mx-auto">
         <h1 class="text-2xl font-bold">マイレシピ一覧</h1>
         <div class="mt-2">
             <a href="{{ route('recipes.create') }}" class="btn btn-primary">

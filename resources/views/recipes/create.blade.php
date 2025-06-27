@@ -2,11 +2,13 @@
 
 @section('content')
 
-    <div class="prose ml-4">
+    <!-- <div class="prose ml-4">
         <h2 class="text-lg">レシピ作成</h2>
-    </div>
+    </div> -->
 
-    <div class="flex justify-center">
+    <div class="mt-4 max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4">レシピ作成</h1>
+
         <form method="POST" action="{{ route('recipes.store') }}">
             @csrf
 
